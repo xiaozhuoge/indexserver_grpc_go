@@ -27,6 +27,7 @@ type IndexServiceClient interface {
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*OperResponse, error)
 	AddUserFragment(ctx context.Context, in *AddUserFragmentRequest, opts ...grpc.CallOption) (*OperResponse, error)
 	DeleteFragment(ctx context.Context, in *DeleteFragmentRequest, opts ...grpc.CallOption) (*OperResponse, error)
+	DeleteFragmentByUserId(ctx context.Context, in *DeleteFragmentByUserIdRequest, opts ...grpc.CallOption) (*OperResponse, error)
 	QueryNearbyPerson(ctx context.Context, in *QueryNearbyPersonRequest, opts ...grpc.CallOption) (*SearchUserOnLineAndLocationResponse, error)
 	QueryNearbyFragment(ctx context.Context, in *QueryNearbyFragmentRequest, opts ...grpc.CallOption) (*SearchUserFragmentResponse, error)
 	QueryEventLog(ctx context.Context, in *QueryEventLogRequest, opts ...grpc.CallOption) (*SearchEventLogResponse, error)
@@ -85,6 +86,15 @@ func (c *indexServiceClient) DeleteFragment(ctx context.Context, in *DeleteFragm
 	return out, nil
 }
 
+func (c *indexServiceClient) DeleteFragmentByUserId(ctx context.Context, in *DeleteFragmentByUserIdRequest, opts ...grpc.CallOption) (*OperResponse, error) {
+	out := new(OperResponse)
+	err := c.cc.Invoke(ctx, "/indexserver_grpc.IndexService/DeleteFragmentByUserId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *indexServiceClient) QueryNearbyPerson(ctx context.Context, in *QueryNearbyPersonRequest, opts ...grpc.CallOption) (*SearchUserOnLineAndLocationResponse, error) {
 	out := new(SearchUserOnLineAndLocationResponse)
 	err := c.cc.Invoke(ctx, "/indexserver_grpc.IndexService/QueryNearbyPerson", in, out, opts...)
@@ -121,6 +131,7 @@ type IndexServiceServer interface {
 	DeleteUser(context.Context, *DeleteUserRequest) (*OperResponse, error)
 	AddUserFragment(context.Context, *AddUserFragmentRequest) (*OperResponse, error)
 	DeleteFragment(context.Context, *DeleteFragmentRequest) (*OperResponse, error)
+	DeleteFragmentByUserId(context.Context, *DeleteFragmentByUserIdRequest) (*OperResponse, error)
 	QueryNearbyPerson(context.Context, *QueryNearbyPersonRequest) (*SearchUserOnLineAndLocationResponse, error)
 	QueryNearbyFragment(context.Context, *QueryNearbyFragmentRequest) (*SearchUserFragmentResponse, error)
 	QueryEventLog(context.Context, *QueryEventLogRequest) (*SearchEventLogResponse, error)
@@ -145,6 +156,9 @@ func (UnimplementedIndexServiceServer) AddUserFragment(context.Context, *AddUser
 }
 func (UnimplementedIndexServiceServer) DeleteFragment(context.Context, *DeleteFragmentRequest) (*OperResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFragment not implemented")
+}
+func (UnimplementedIndexServiceServer) DeleteFragmentByUserId(context.Context, *DeleteFragmentByUserIdRequest) (*OperResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFragmentByUserId not implemented")
 }
 func (UnimplementedIndexServiceServer) QueryNearbyPerson(context.Context, *QueryNearbyPersonRequest) (*SearchUserOnLineAndLocationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QueryNearbyPerson not implemented")
@@ -258,6 +272,24 @@ func _IndexService_DeleteFragment_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IndexService_DeleteFragmentByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteFragmentByUserIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IndexServiceServer).DeleteFragmentByUserId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/indexserver_grpc.IndexService/DeleteFragmentByUserId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IndexServiceServer).DeleteFragmentByUserId(ctx, req.(*DeleteFragmentByUserIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IndexService_QueryNearbyPerson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryNearbyPersonRequest)
 	if err := dec(in); err != nil {
@@ -338,6 +370,10 @@ var IndexService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteFragment",
 			Handler:    _IndexService_DeleteFragment_Handler,
+		},
+		{
+			MethodName: "DeleteFragmentByUserId",
+			Handler:    _IndexService_DeleteFragmentByUserId_Handler,
 		},
 		{
 			MethodName: "QueryNearbyPerson",
